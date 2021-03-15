@@ -90,7 +90,7 @@ ClassicEditor.defaultConfig = {
 			"awareMediaLibrary",
 			"blockQuote",
 			"insertTable",
-			"mediaEmbed",
+			// "mediaEmbed",
 			"undo",
 			"redo",
 		],
