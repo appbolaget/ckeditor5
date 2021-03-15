@@ -21,6 +21,7 @@ import ImageStyle from "@ckeditor/ckeditor5-image/src/imagestyle";
 import ImageToolbar from "@ckeditor/ckeditor5-image/src/imagetoolbar";
 import ImageUpload from "@ckeditor/ckeditor5-image/src/imageupload";
 import ImageResize from "@ckeditor/ckeditor5-image/src/imageresize";
+import LinkImage from "@ckeditor/ckeditor5-link/src/linkimage";
 import Indent from "@ckeditor/ckeditor5-indent/src/indent";
 import Link from "@ckeditor/ckeditor5-link/src/link";
 import List from "@ckeditor/ckeditor5-list/src/list";
@@ -67,6 +68,7 @@ ClassicEditor.builtinPlugins = [
 	Alignment,
 	AwareMediaLibraryPlugin,
 	ImageResize,
+	LinkImage,
 ];
 
 // Editor configuration.
