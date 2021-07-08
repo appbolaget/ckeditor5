@@ -152,19 +152,19 @@ export default class FileRepository extends Plugin {
 			 * You need to enable an upload adapter in order to be able to upload files.
 			 *
 			 * This warning shows up when {@link module:upload/filerepository~FileRepository} is being used
-			 * without {@link #createUploadAdapter definining an upload adapter}.
+			 * without {@link #createUploadAdapter defining an upload adapter}.
 			 *
 			 * **If you see this warning when using one of the {@glink builds/index CKEditor 5 Builds}**
 			 * it means that you did not configure any of the upload adapters available by default in those builds.
 			 *
-			 * See the {@glink features/image-upload/image-upload comprehensive "Image upload overview"} to learn which upload
+			 * See the {@glink features/images/image-upload/image-upload comprehensive "Image upload overview"} to learn which upload
 			 * adapters are available in the builds and how to configure them.
 			 *
 			 * **If you see this warning when using a custom build** there is a chance that you enabled
 			 * a feature like {@link module:image/imageupload~ImageUpload},
 			 * or {@link module:image/imageupload/imageuploadui~ImageUploadUI} but you did not enable any upload adapter.
 			 * You can choose one of the existing upload adapters listed in the
-			 * {@glink features/image-upload/image-upload "Image upload overview"}.
+			 * {@glink features/images/image-upload/image-upload "Image upload overview"}.
 			 *
 			 * You can also implement your {@glink framework/guides/deep-dive/upload-adapter own image upload adapter}.
 			 *
@@ -607,6 +607,20 @@ mix( FileLoader, ObservableMixin );
  *			'500': 'http://server/size-500.image.png',
  *			'1000': 'http://server/size-1000.image.png',
  *			'1052': 'http://server/default-size.image.png'
+ *		}
+ *
+ * You can also pass additional properties from the server. In this case you need to wrap URLs
+ * in the `urls` object and pass additional properties along the `urls` property.
+ *
+ * 		{
+ * 			myCustomProperty: 'foo',
+ * 			urls: {
+ *				default: 'http://server/default-size.image.png',
+ *				'160': 'http://server/size-160.image.png',
+ *				'500': 'http://server/size-500.image.png',
+ *				'1000': 'http://server/size-1000.image.png',
+ *				'1052': 'http://server/default-size.image.png'
+ *			}
  *		}
  *
  * NOTE: When returning multiple images, the widest returned one should equal the default one. It is essential to

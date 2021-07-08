@@ -3,7 +3,7 @@ CKEditor 5 [![Tweet](https://img.shields.io/twitter/url/http/shields.io.svg?styl
 
 [![npm version](https://badge.fury.io/js/ckeditor5.svg)](https://www.npmjs.com/package/ckeditor5)
 
-[![Build Status](https://travis-ci.org/ckeditor/ckeditor5.svg?branch=master)](https://travis-ci.org/ckeditor/ckeditor5)
+[![Build Status](https://travis-ci.com/ckeditor/ckeditor5.svg?branch=master)](https://travis-ci.com/ckeditor/ckeditor5)
 [![Dependency Status](https://img.shields.io/david/ckeditor/ckeditor5.svg)](https://david-dm.org/ckeditor/ckeditor5)
 [![devDependency Status](https://img.shields.io/david/dev/ckeditor/ckeditor5.svg)](https://david-dm.org/ckeditor/ckeditor5?type=dev)
 
@@ -461,6 +461,18 @@ See CKEditor 5 release blog posts [on the CKEditor blog](https://ckeditor.com/bl
 
 <tr>
 	<td>
+		<a href="https://github.com/ckeditor/ckeditor5/tree/master/packages/ckeditor5-find-and-replace"><code>@ckeditor/ckeditor5-find-and-replace</code></a>
+	</td>
+	<td>
+		<a href="https://www.npmjs.com/package/@ckeditor/ckeditor5-find-and-replace"><img src="https://img.shields.io/npm/v/@ckeditor/ckeditor5-find-and-replace.svg" alt="@ckeditor/ckeditor5-find-and-replace npm package badge"></a>
+	</td>
+	<td>
+		The find and replace feature.
+	</td>
+</tr>
+
+<tr>
+	<td>
 		<a href="https://github.com/ckeditor/ckeditor5/tree/master/packages/ckeditor5-font"><code>@ckeditor/ckeditor5-font</code></a>
 	</td>
 	<td>
@@ -521,6 +533,18 @@ See CKEditor 5 release blog posts [on the CKEditor blog](https://ckeditor.com/bl
 
 <tr>
 	<td>
+		<a href="https://github.com/ckeditor/ckeditor5/tree/master/packages/ckeditor5-html-support"><code>@ckeditor/ckeditor5-html-support</code></a>
+	</td>
+	<td>
+		<a href="https://www.npmjs.com/package/@ckeditor/ckeditor5-html-support"><img src="https://img.shields.io/npm/v/@ckeditor/ckeditor5-html-support.svg" alt="@ckeditor/ckeditor5-html-support npm package badge"></a>
+	</td>
+	<td>
+		The General HTML Support feature.
+	</td>
+</tr>
+
+<tr>
+	<td>
 		<a href="https://github.com/ckeditor/ckeditor5/tree/master/packages/ckeditor5-image"><code>@ckeditor/ckeditor5-image</code></a>
 	</td>
 	<td>
@@ -540,6 +564,18 @@ See CKEditor 5 release blog posts [on the CKEditor blog](https://ckeditor.com/bl
 	</td>
 	<td>
 		The indentation (of lists and blocks) feature.
+	</td>
+</tr>
+
+<tr>
+	<td>
+		<a href="https://github.com/ckeditor/ckeditor5/tree/master/packages/ckeditor5-language"><code>@ckeditor/ckeditor5-language</code></a>
+	</td>
+	<td>
+		<a href="https://www.npmjs.com/package/@ckeditor/ckeditor5-language"><img src="https://img.shields.io/npm/v/@ckeditor/ckeditor5-language.svg" alt="@ckeditor/ckeditor5-language npm package badge"></a>
+	</td>
+	<td>
+		The text part language feature.
 	</td>
 </tr>
 
@@ -672,6 +708,18 @@ See CKEditor 5 release blog posts [on the CKEditor blog](https://ckeditor.com/bl
 	</td>
 	<td>
 		The "select all" feature.
+	</td>
+</tr>
+
+<tr>
+	<td>
+		<a href="https://github.com/ckeditor/ckeditor5/tree/master/packages/ckeditor5-source-editing"><code>@ckeditor/ckeditor5-source-editing</code></a>
+	</td>
+	<td>
+		<a href="https://www.npmjs.com/package/@ckeditor/ckeditor5-source-editing"><img src="https://img.shields.io/npm/v/@ckeditor/ckeditor5-source-editing.svg" alt="@ckeditor/ckeditor5-source-editing npm package badge"></a>
+	</td>
+	<td>
+		The source editing feature.
 	</td>
 </tr>
 

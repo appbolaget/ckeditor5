@@ -327,15 +327,29 @@ describe( 'AutoMediaEmbed - integration', () => {
 			);
 		} );
 
+		// s/ckeditor5/3
+		it( 'should handle invalid URL with repeated characters', () => {
+			const invalidURL = 'a.' + 'a'.repeat( 100000 ) + '^';
+
+			setData( editor.model, '<paragraph>[]</paragraph>' );
+			pasteHtml( editor, invalidURL );
+
+			clock.tick( 100 );
+
+			expect( getData( editor.model ) ).to.equal(
+				`<paragraph>${ invalidURL }[]</paragraph>`
+			);
+		} );
+
 		// #47
 		it( 'does not transform a valid URL into a media if the element cannot be placed in the current position', () => {
-			setData( editor.model, '<image src="/assets/sample.png"><caption>Foo.[]</caption></image>' );
+			setData( editor.model, '<imageBlock src="/assets/sample.png"><caption>Foo.[]</caption></imageBlock>' );
 			pasteHtml( editor, 'https://www.youtube.com/watch?v=H08tGjXNHO4' );
 
 			clock.tick( 100 );
 
 			expect( getData( editor.model ) ).to.equal(
-				'<image src="/assets/sample.png"><caption>Foo.https://www.youtube.com/watch?v=H08tGjXNHO4[]</caption></image>'
+				'<imageBlock src="/assets/sample.png"><caption>Foo.https://www.youtube.com/watch?v=H08tGjXNHO4[]</caption></imageBlock>'
 			);
 		} );
 

@@ -10,15 +10,12 @@
 import Plugin from '@ckeditor/ckeditor5-core/src/plugin';
 import MouseObserver from '@ckeditor/ckeditor5-engine/src/view/observer/mouseobserver';
 import WidgetTypeAround from './widgettypearound/widgettypearound';
+import Delete from '@ckeditor/ckeditor5-typing/src/delete';
 import { getLabel, isWidget, WIDGET_SELECTED_CLASS_NAME } from './utils';
-import {
-	isArrowKeyCode,
-	isForwardArrowKeyCode
-} from '@ckeditor/ckeditor5-utils/src/keyboard';
+import { isForwardArrowKeyCode } from '@ckeditor/ckeditor5-utils/src/keyboard';
 import env from '@ckeditor/ckeditor5-utils/src/env';
 
 import '../theme/widget.css';
-import priorities from '@ckeditor/ckeditor5-utils/src/priorities';
 import verticalNavigationHandler from './verticalnavigation';
 
 /**
@@ -48,14 +45,15 @@ export default class Widget extends Plugin {
 	 * @inheritDoc
 	 */
 	static get requires() {
-		return [ WidgetTypeAround ];
+		return [ WidgetTypeAround, Delete ];
 	}
 
 	/**
 	 * @inheritDoc
 	 */
 	init() {
-		const view = this.editor.editing.view;
+		const editor = this.editor;
+		const view = editor.editing.view;
 		const viewDocument = view.document;
 
 		/**
@@ -67,17 +65,69 @@ export default class Widget extends Plugin {
 		this._previouslySelected = new Set();
 
 		// Model to view selection converter.
-		// Converts selection placed over widget element to fake selection
+		// Converts selection placed over widget element to fake selection.
+		//
+		// By default, the selection is downcasted by the engine to surround the attribute element, even though its only
+		// child is an inline widget. A similar thing also happens when a collapsed marker is rendered as a UI element
+		// next to an inline widget: the view selection contains both the widget and the marker.
+		//
+		// This prevents creating a correct fake selection when this inline widget is selected. Normalize the selection
+		// in these cases based on the model:
+		//
+		//		[<attributeElement><inlineWidget /></attributeElement>] -> <attributeElement>[<inlineWidget />]</attributeElement>
+		//		[<uiElement></uiElement><inlineWidget />] -> <uiElement></uiElement>[<inlineWidget />]
+		//
+		// Thanks to this:
+		//
+		// * fake selection can be set correctly,
+		// * any logic depending on (View)Selection#getSelectedElement() also works OK.
+		//
+		// See https://github.com/ckeditor/ckeditor5/issues/9524.
+		this.editor.editing.downcastDispatcher.on( 'selection', ( evt, data, conversionApi ) => {
+			const viewWriter = conversionApi.writer;
+			const modelSelection = data.selection;
+
+			// The collapsed selection can't contain any widget.
+			if ( modelSelection.isCollapsed ) {
+				return;
+			}
+
+			const selectedModelElement = modelSelection.getSelectedElement();
+
+			if ( !selectedModelElement ) {
+				return;
+			}
+
+			const selectedViewElement = editor.editing.mapper.toViewElement( selectedModelElement );
+
+			if ( !isWidget( selectedViewElement ) ) {
+				return;
+			}
+
+			if ( !conversionApi.consumable.consume( modelSelection, 'selection' ) ) {
+				return;
+			}
+
+			viewWriter.setSelection( viewWriter.createRangeOn( selectedViewElement ), {
+				fake: true,
+				label: getLabel( selectedViewElement )
+			} );
+		} );
+
+		// Mark all widgets inside the selection with the css class.
+		// This handler is registered at the 'low' priority so it's triggered after the real selection conversion.
 		this.editor.editing.downcastDispatcher.on( 'selection', ( evt, data, conversionApi ) => {
 			// Remove selected class from previously selected widgets.
 			this._clearPreviouslySelectedWidgets( conversionApi.writer );
 
 			const viewWriter = conversionApi.writer;
 			const viewSelection = viewWriter.document.selection;
-			const selectedElement = viewSelection.getSelectedElement();
+
 			let lastMarked = null;
 
 			for ( const range of viewSelection.getRanges() ) {
+				// Note: There could be multiple selected widgets in a range but no fake selection.
+				// All of them must be marked as selected, for instance [<widget></widget><widget></widget>]
 				for ( const value of range ) {
 					const node = value.item;
 
@@ -87,11 +137,6 @@ export default class Widget extends Plugin {
 
 						this._previouslySelected.add( node );
 						lastMarked = node;
-
-						// Check if widget is a single element selected.
-						if ( node == selectedElement ) {
-							viewWriter.setSelection( viewSelection.getRanges(), { fake: true, label: getLabel( selectedElement ) } );
-						}
 					}
 				}
 			}
@@ -112,15 +157,15 @@ export default class Widget extends Plugin {
 		// * The second (late) listener makes sure the default browser action on arrow key press is
 		// prevented when a widget is selected. This prevents the selection from being moved
 		// from a fake selection container.
-		this.listenTo( viewDocument, 'keydown', ( ...args ) => {
+		this.listenTo( viewDocument, 'arrowKey', ( ...args ) => {
 			this._handleSelectionChangeOnArrowKeyPress( ...args );
-		}, { priority: 'high' } );
+		}, { context: [ isWidget, '$text' ] } );
 
-		this.listenTo( viewDocument, 'keydown', ( ...args ) => {
+		this.listenTo( viewDocument, 'arrowKey', ( ...args ) => {
 			this._preventDefaultOnArrowKeyPress( ...args );
-		}, { priority: priorities.get( 'high' ) - 20 } );
+		}, { context: '$root' } );
 
-		this.listenTo( viewDocument, 'keydown', verticalNavigationHandler( this.editor.editing ) );
+		this.listenTo( viewDocument, 'arrowKey', verticalNavigationHandler( this.editor.editing ), { context: '$text' } );
 
 		// Handle custom delete behaviour.
 		this.listenTo( viewDocument, 'delete', ( evt, data ) => {
@@ -128,7 +173,7 @@ export default class Widget extends Plugin {
 				data.preventDefault();
 				evt.stop();
 			}
-		}, { priority: 'high' } );
+		}, { context: '$root' } );
 	}
 
 	/**
@@ -174,7 +219,11 @@ export default class Widget extends Plugin {
 			}
 		}
 
-		domEventData.preventDefault();
+		// On Android selection would jump to the first table cell, on other devices
+		// we can't block it (and don't need to) because of drag and drop support.
+		if ( env.isAndroid ) {
+			domEventData.preventDefault();
+		}
 
 		// Focus editor if is not focused already.
 		if ( !viewDocument.isFocused ) {
@@ -202,12 +251,6 @@ export default class Widget extends Plugin {
 	 */
 	_handleSelectionChangeOnArrowKeyPress( eventInfo, domEventData ) {
 		const keyCode = domEventData.keyCode;
-
-		// Checks if the keys were handled and then prevents the default event behaviour and stops
-		// the propagation.
-		if ( !isArrowKeyCode( keyCode ) ) {
-			return;
-		}
 
 		const model = this.editor.model;
 		const schema = model.schema;
@@ -260,14 +303,6 @@ export default class Widget extends Plugin {
 	 * @param {module:engine/view/observer/domeventdata~DomEventData} domEventData
 	 */
 	_preventDefaultOnArrowKeyPress( eventInfo, domEventData ) {
-		const keyCode = domEventData.keyCode;
-
-		// Checks if the keys were handled and then prevents the default event behaviour and stops
-		// the propagation.
-		if ( !isArrowKeyCode( keyCode ) ) {
-			return;
-		}
-
 		const model = this.editor.model;
 		const schema = model.schema;
 		const objectElement = model.document.selection.getSelectedElement();
